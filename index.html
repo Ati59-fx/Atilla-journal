@@ -233,7 +233,6 @@
 </header>
 
 <main>
-  <!-- LOG -->
   <div id="tab-log" class="section active">
     <div class="pin-bar">
       <label>ADMİN PİN</label>
@@ -266,7 +265,7 @@
         <input type="number" id="f-rr" placeholder="2.5" step="0.1" min="0" />
       </div>
       <div class="field form-full">
-        <label>PnL — sadece pozitif sayı gir (win = otomatik +, lose = otomatik −)</label>
+        <label>PNL</label>
         <input type="number" id="f-pnl" placeholder="150" min="0" oninput="updatePnlPreview()" />
         <div class="pnl-preview" id="pnl-preview"></div>
       </div>
@@ -283,7 +282,6 @@
     <div class="msg" id="form-msg"></div>
   </div>
 
-  <!-- LIST -->
   <div id="tab-list" class="section">
     <div class="list-header">
       <div class="list-title">İşlemler</div>
@@ -300,13 +298,12 @@
     <div id="trade-list"></div>
   </div>
 
-  <!-- STATS -->
   <div id="tab-stats" class="section">
     <div class="stats-title">İstatistik</div>
     <div class="stats-grid" id="stats-grid"></div>
 
     <div class="chart-wrap">
-      <div class="chart-label">Equity Curve — Kümülatif PnL</div>
+      <div class="chart-label">Equity Curve — Kümülatif PnL (25k Başlangıç)</div>
       <div class="chart-canvas"><canvas id="equity-chart"></canvas></div>
     </div>
 
@@ -339,6 +336,7 @@
 const SUPABASE_URL = 'https://ssopmrubowgvdjhitfba.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_pn_1Ve9kiTi9IkzEssOchg_Qd6VA3pu';
 const ADMIN_PIN = '1234';
+const INITIAL_BALANCE = 25000;
 const H = { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY };
 
 let trades = [];
@@ -538,16 +536,24 @@ function renderStats() {
 function renderEquityChart() {
   if (!trades.length) return;
   const sorted = [...trades].sort((a, b) => a.date.localeCompare(b.date) || a.id - b.id);
-  let cum = 0;
-  const labels = [];
-  const data = sorted.map(t => { cum += Number(t.pnl); labels.push(t.date); return parseFloat(cum.toFixed(2)); });
+  let cum = INITIAL_BALANCE;
+  const labels = ['Başlangıç'];
+  const data = [INITIAL_BALANCE];
+  
+  sorted.forEach(t => { 
+    cum += Number(t.pnl); 
+    labels.push(t.date); 
+    data.push(parseFloat(cum.toFixed(2))); 
+  });
+
   if (equityChart) equityChart.destroy();
   const ctx = document.getElementById('equity-chart').getContext('2d');
-  const lastVal = data[data.length - 1] || 0;
-  const color = lastVal >= 0 ? '#00ff88' : '#ff4455';
+  const lastVal = data[data.length - 1] || INITIAL_BALANCE;
+  const color = lastVal >= INITIAL_BALANCE ? '#00ff88' : '#ff4455';
+  
   equityChart = new Chart(ctx, {
     type: 'line',
-    data: { labels, datasets: [{ data, borderColor: color, borderWidth: 2, pointRadius: data.length > 30 ? 0 : 3, pointBackgroundColor: color, fill: true, backgroundColor: lastVal >= 0 ? 'rgba(0,255,136,0.07)' : 'rgba(255,68,85,0.07)', tension: 0.3 }] },
+    data: { labels, datasets: [{ data, borderColor: color, borderWidth: 2, pointRadius: data.length > 30 ? 0 : 3, pointBackgroundColor: color, fill: true, backgroundColor: lastVal >= INITIAL_BALANCE ? 'rgba(0,255,136,0.07)' : 'rgba(255,68,85,0.07)', tension: 0.3 }] },
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: { legend: { display: false } },
