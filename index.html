@@ -20,6 +20,8 @@
     --green-dim: #00ff8822;
     --red: #ff4455;
     --red-dim: #ff445522;
+    --neutral: #888;
+    --neutral-dim: #88888822;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Syne', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
@@ -78,10 +80,12 @@
   }
   .result-btn.win.active { background: var(--green-dim); border-color: var(--green); color: var(--green); }
   .result-btn.lose.active { background: var(--red-dim); border-color: var(--red); color: var(--red); }
+  .result-btn.be.active { background: var(--neutral-dim); border-color: var(--neutral); color: var(--neutral); }
 
   .pnl-preview { font-size: 11px; font-family: 'JetBrains Mono', monospace; margin-top: 4px; height: 16px; }
   .pnl-preview.pos { color: var(--green); }
   .pnl-preview.neg { color: var(--red); }
+  .pnl-preview.neu { color: var(--neutral); }
 
   .submit-btn {
     width: 100%; margin-top: 16px; padding: 12px; background: var(--green); color: #000;
@@ -123,11 +127,14 @@
   .trade-card:hover { border-color: var(--border2); }
   .trade-card.win { border-left: 3px solid var(--green); }
   .trade-card.lose { border-left: 3px solid var(--red); }
+  .trade-card.be { border-left: 3px solid var(--neutral); }
 
   .trade-top { display: flex; align-items: center; gap: 12px; padding: 12px 16px; cursor: pointer; }
   .badge { font-size: 10px; font-weight: 800; letter-spacing: 1px; padding: 3px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; }
   .badge.win { background: var(--green-dim); color: var(--green); }
   .badge.lose { background: var(--red-dim); color: var(--red); }
+  .badge.be { background: var(--neutral-dim); color: var(--neutral); }
+  
   .sym-badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 4px; background: #1a1a1a; color: var(--muted); font-family: 'JetBrains Mono', monospace; border: 1px solid var(--border2); }
 
   .trade-meta { display: flex; gap: 16px; flex: 1; flex-wrap: wrap; }
@@ -156,6 +163,7 @@
   .stat-val { font-size: 24px; font-weight: 800; font-family: 'JetBrains Mono', monospace; letter-spacing: -1px; }
   .stat-val.pos { color: var(--green); }
   .stat-val.neg { color: var(--red); }
+  .stat-detail { font-size: 11px; color: var(--muted); margin-top: 6px; font-family: 'JetBrains Mono', monospace; line-height: 1.4; }
 
   .chart-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 2rem; }
   .chart-label { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px; }
@@ -249,6 +257,7 @@
         <label>Sonuç</label>
         <div class="result-row">
           <button class="result-btn win" id="btn-win" onclick="selectResult('win')">WIN</button>
+          <button class="result-btn be" id="btn-be" onclick="selectResult('be')">B.E</button>
           <button class="result-btn lose" id="btn-lose" onclick="selectResult('lose')">LOSE</button>
         </div>
       </div>
@@ -290,6 +299,7 @@
     <div class="filter-row">
       <button class="filter-btn active" onclick="setFilter(this,'all')">Tümü</button>
       <button class="filter-btn" onclick="setFilter(this,'win')">WIN</button>
+      <button class="filter-btn" onclick="setFilter(this,'be')">B.E</button>
       <button class="filter-btn" onclick="setFilter(this,'lose')">LOSE</button>
       <button class="filter-btn" onclick="setFilter(this,'MNQ1!')">MNQ1!</button>
       <button class="filter-btn" onclick="setFilter(this,'MES1!')">MES1!</button>
@@ -371,15 +381,24 @@ function checkPin() {
 function selectResult(v) {
   selectedResult = v;
   document.getElementById('btn-win').className = 'result-btn win' + (v==='win'?' active':'');
+  document.getElementById('btn-be').className = 'result-btn be' + (v==='be'?' active':'');
   document.getElementById('btn-lose').className = 'result-btn lose' + (v==='lose'?' active':'');
+  
+  if(v === 'be') {
+    document.getElementById('f-pnl').value = 0;
+  }
   updatePnlPreview();
 }
 
 function updatePnlPreview() {
   const val = parseFloat(document.getElementById('f-pnl').value);
   const prev = document.getElementById('pnl-preview');
-  if (!selectedResult || isNaN(val) || val <= 0) { prev.textContent = ''; prev.className = 'pnl-preview'; return; }
-  if (selectedResult === 'win') {
+  if (!selectedResult || isNaN(val)) { prev.textContent = ''; prev.className = 'pnl-preview'; return; }
+  
+  if (selectedResult === 'be') {
+    prev.textContent = '→ $0 (Break-even) olarak kaydedilecek';
+    prev.className = 'pnl-preview neu';
+  } else if (selectedResult === 'win') {
     prev.textContent = '→ +$' + val.toFixed(0) + ' olarak kaydedilecek';
     prev.className = 'pnl-preview pos';
   } else {
@@ -410,11 +429,15 @@ async function addTrade() {
   const notes = document.getElementById('f-notes').value.trim();
   const symbol = document.getElementById('f-symbol').value;
 
-  if (!date || !selectedResult || isNaN(rr) || isNaN(rawPnl) || rawPnl <= 0) {
-    showMsg('Tarih, sonuç, RR ve PnL zorunlu!', 'err'); return;
+  if (!date || !selectedResult || isNaN(rr) || isNaN(rawPnl)) {
+    showMsg('Zorunlu alanları doldur!', 'err'); return;
   }
 
-  const pnl = selectedResult === 'win' ? Math.abs(rawPnl) : -Math.abs(rawPnl);
+  let pnl = 0;
+  if(selectedResult === 'win') pnl = Math.abs(rawPnl);
+  else if(selectedResult === 'lose') pnl = -Math.abs(rawPnl);
+  else pnl = 0;
+
   const btn = document.getElementById('submit-btn');
   btn.disabled = true; btn.textContent = 'KAYDEDİLİYOR...';
 
@@ -433,6 +456,7 @@ async function addTrade() {
     document.getElementById('pnl-preview').textContent = '';
     selectedResult = null;
     document.getElementById('btn-win').className = 'result-btn win';
+    document.getElementById('btn-be').className = 'result-btn be';
     document.getElementById('btn-lose').className = 'result-btn lose';
     await loadTrades();
   } catch(e) { showMsg('Kaydetme hatası!', 'err'); }
@@ -484,7 +508,7 @@ function render() {
 function filteredTrades() {
   const rev = [...trades].reverse();
   if (activeFilter === 'all') return rev;
-  if (activeFilter === 'win' || activeFilter === 'lose') return rev.filter(t => t.result === activeFilter);
+  if (['win', 'lose', 'be'].includes(activeFilter)) return rev.filter(t => t.result === activeFilter);
   return rev.filter(t => (t.symbol || 'MNQ1!') === activeFilter);
 }
 
@@ -496,12 +520,12 @@ function renderList() {
   el.innerHTML = list.map(t => `
     <div class="trade-card ${t.result}">
       <div class="trade-top" onclick="toggleNotes(${t.id})">
-        <span class="badge ${t.result}">${t.result.toUpperCase()}</span>
+        <span class="badge ${t.result}">${t.result === 'be' ? 'B.E' : t.result.toUpperCase()}</span>
         <span class="sym-badge">${t.symbol || 'MNQ1!'}</span>
         <div class="trade-meta">
           <div class="meta-item"><span style="font-size:10px">TARİH</span><span class="meta-val">${t.date}</span></div>
           <div class="meta-item"><span style="font-size:10px">RR</span><span class="meta-val">${t.rr}R</span></div>
-          <div class="meta-item"><span style="font-size:10px">PNL</span><span class="meta-val ${Number(t.pnl)>=0?'pos':'neg'}">${Number(t.pnl)>=0?'+':''}$${Math.abs(Number(t.pnl)).toFixed(0)}</span></div>
+          <div class="meta-item"><span style="font-size:10px">PNL</span><span class="meta-val ${Number(t.pnl)>0?'pos':(Number(t.pnl)<0?'neg':'')}">${Number(t.pnl)>0?'+':''}$${Math.abs(Number(t.pnl)).toFixed(0)}</span></div>
         </div>
         <div class="trade-actions">
           ${t.link ? '<a class="chart-link" href="' + t.link + '" target="_blank" onclick="event.stopPropagation()">CHART ↗</a>' : ''}
@@ -517,17 +541,34 @@ function renderList() {
 function renderStats() {
   const el = document.getElementById('stats-grid');
   if (!trades.length) { el.innerHTML = ''; return; }
-  const wins = trades.filter(t => t.result === 'win').length;
+  
   const total = trades.length;
-  const wr = ((wins / total) * 100).toFixed(1);
+  const wins = trades.filter(t => t.result === 'win').length;
+  const loses = trades.filter(t => t.result === 'lose').length;
+  const bes = trades.filter(t => t.result === 'be').length;
+
+  // Win Rate (Sadece Win ve Lose üzerinden hesaplanır, BE dahil edilmez)
+  const wrBase = wins + loses;
+  const wr = wrBase > 0 ? ((wins / wrBase) * 100).toFixed(1) : "0.0";
+  
+  // Dağılım Oranları (Tüm işlemler üzerinden)
+  const winPct = ((wins / total) * 100).toFixed(1);
+  const losePct = ((loses / total) * 100).toFixed(1);
+  const bePct = ((bes / total) * 100).toFixed(1);
+
   const totalPnl = trades.reduce((s, t) => s + Number(t.pnl), 0);
   const grossWin = trades.filter(t => Number(t.pnl) > 0).reduce((s, t) => s + Number(t.pnl), 0);
   const grossLoss = Math.abs(trades.filter(t => Number(t.pnl) < 0).reduce((s, t) => s + Number(t.pnl), 0));
   const pf = grossLoss === 0 ? '∞' : (grossWin / grossLoss).toFixed(2);
   const avgRR = (trades.reduce((s, t) => s + Number(t.rr), 0) / total).toFixed(2);
+
   el.innerHTML = `
     <div class="stat-card"><div class="stat-label">Toplam PnL</div><div class="stat-val ${totalPnl>=0?'pos':'neg'}">${totalPnl>=0?'+':''}$${totalPnl.toFixed(0)}</div></div>
-    <div class="stat-card"><div class="stat-label">Win Rate</div><div class="stat-val">${wr}%</div></div>
+    <div class="stat-card">
+        <div class="stat-label">Win Rate</div>
+        <div class="stat-val">${wr}%</div>
+        <div class="stat-detail">W:${winPct}% | L:${losePct}% | B:${bePct}%</div>
+    </div>
     <div class="stat-card"><div class="stat-label">Profit Factor</div><div class="stat-val">${pf}</div></div>
     <div class="stat-card"><div class="stat-label">Ort. RR</div><div class="stat-val">${avgRR}R</div></div>
   `;
@@ -572,13 +613,16 @@ function renderSymbolStats() {
     const st = trades.filter(t => (t.symbol || 'MNQ1!') === sym);
     if (!st.length) return '<div class="symbol-card"><div class="symbol-name">' + sym + '</div><div class="symbol-row"><span>İşlem yok</span></div></div>';
     const wins = st.filter(t => t.result === 'win').length;
-    const wr = ((wins / st.length) * 100).toFixed(1);
+    const loses = st.filter(t => t.result === 'lose').length;
+    const bes = st.filter(t => t.result === 'be').length;
+    const wrBase = wins + loses;
+    const wr = wrBase > 0 ? ((wins / wrBase) * 100).toFixed(1) : "0.0";
     const pnl = st.reduce((s, t) => s + Number(t.pnl), 0);
     return '<div class="symbol-card"><div class="symbol-name">' + sym + '</div>' +
       '<div class="symbol-row"><span>İşlem</span><span>' + st.length + '</span></div>' +
       '<div class="symbol-row"><span>Win Rate</span><span>' + wr + '%</span></div>' +
       '<div class="symbol-row"><span>PnL</span><span style="color:' + (pnl>=0?'var(--green)':'var(--red)') + '">' + (pnl>=0?'+':'') + '$' + pnl.toFixed(0) + '</span></div>' +
-      '<div class="symbol-row"><span>Win / Lose</span><span>' + wins + ' / ' + (st.length - wins) + '</span></div></div>';
+      '<div class="symbol-row"><span>W / L / B</span><span>' + wins + '/' + loses + '/' + bes + '</span></div></div>';
   }).join('');
 }
 
@@ -610,7 +654,9 @@ function renderPeriod() {
   el.innerHTML = keys.map(key => {
     const g = groups[key];
     const wins = g.filter(t => t.result === 'win').length;
-    const wr = ((wins / g.length) * 100).toFixed(0);
+    const loses = g.filter(t => t.result === 'lose').length;
+    const wrBase = wins + loses;
+    const wr = wrBase > 0 ? ((wins / wrBase) * 100).toFixed(0) : "0";
     const pnl = g.reduce((s, t) => s + Number(t.pnl), 0);
     const barPct = maxAbsPnl > 0 ? Math.round((Math.abs(pnl) / maxAbsPnl) * 100) : 0;
     return '<div class="period-row">' +
@@ -653,9 +699,12 @@ function renderCal() {
     const data = dayData[d];
     let cls = 'cal-day';
     if (ds === today) cls += ' today';
-    else if (data) cls += data.pnl >= 0 ? ' profit' : ' loss';
+    else if (data) {
+        if(data.pnl > 0) cls += ' profit';
+        else if(data.pnl < 0) cls += ' loss';
+    }
     html += '<div class="' + cls + '"><div class="day-num">' + d + '</div>' +
-      (data ? '<div class="day-pnl ' + (data.pnl>=0?'pos':'neg') + '">' + (data.pnl>=0?'+':'') + '$' + Math.abs(data.pnl).toFixed(0) + '</div><div class="day-count">' + data.count + ' işlem</div>' : '') +
+      (data ? '<div class="day-pnl ' + (data.pnl>0?'pos':(data.pnl<0?'neg':'')) + '">' + (data.pnl>0?'+':'') + '$' + Math.abs(data.pnl).toFixed(0) + '</div><div class="day-count">' + data.count + ' işlem</div>' : '') +
       '</div>';
   }
   grid.innerHTML = html;
