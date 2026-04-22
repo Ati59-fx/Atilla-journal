@@ -72,6 +72,7 @@
   .pnl-preview.pos { color: var(--green); }
   .pnl-preview.neg { color: var(--red); }
   .pnl-preview.neu { color: var(--neutral); }
+  .pnl-preview.pap { color: var(--paper); }
 
   .submit-btn { width: 100%; margin-top: 16px; padding: 12px; background: var(--green); color: #000; border: none; border-radius: 8px; font-size: 14px; font-weight: 800; cursor: pointer; font-family: 'Syne', sans-serif; letter-spacing: 0.5px; transition: opacity 0.15s; }
   .submit-btn:hover { opacity: 0.85; }
@@ -86,9 +87,11 @@
   .pin-status { font-size: 12px; font-family: 'JetBrains Mono', monospace; flex: 1; }
   .pin-status.ok { color: var(--green); }
   .pin-status.no { color: var(--muted); }
-  .reset-btn { background: var(--red-dim); color: var(--red); border: 1px solid var(--red); padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 800; cursor: pointer; display: none; transition: 0.15s; }
+  .reset-btn { background: var(--surface2); color: var(--muted); border: 1px solid var(--border2); padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 800; cursor: pointer; display: none; transition: 0.15s; }
   .admin-unlocked .reset-btn { display: block; }
-  .reset-btn:hover { background: var(--red); color: #000; }
+  .reset-btn:hover { background: var(--red-dim); border-color: var(--red); color: var(--red); }
+  #clear-reset-btn { display: none; font-size: 10px; color: var(--muted); cursor: pointer; text-decoration: underline; }
+  #clear-reset-btn:hover { color: var(--text); }
 
   .list-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 10px; }
   .list-title { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
@@ -138,7 +141,9 @@
   .setup-mini-badge { background: var(--surface2); color: #fff; font-size: 10px; padding: 2px 8px; border-radius: 4px; border: 1px solid var(--border2); font-family: 'JetBrains Mono', monospace; font-weight: 600; }
 
   /* İSTATİSTİKLER & GAUGE */
-  .stats-title { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 1.5rem; }
+  .stats-title { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 1.5rem; display:flex; align-items:center; gap:10px; }
+  .reset-badge { font-size: 10px; background: var(--surface2); border:1px solid var(--border2); padding: 4px 8px; border-radius: 4px; color: var(--muted); font-weight: 600; font-family: 'JetBrains Mono', monospace; display: none; }
+  
   .gauge-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 2rem; }
   .gauge-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px; }
   .gauge-title { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
@@ -160,7 +165,7 @@
   .chart-label { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px; }
   .chart-canvas { height: 200px; position: relative; }
 
-  /* SYMBOL GRID (Pair Win Rates) */
+  /* SYMBOL GRID */
   .symbol-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 2rem; }
   .symbol-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
   .symbol-name { font-size: 13px; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--text); margin-bottom: 10px; }
@@ -198,7 +203,7 @@
     .stats-grid { grid-template-columns: 1fr 1fr; }
     .symbol-grid { grid-template-columns: 1fr; }
     .form-grid { grid-template-columns: 1fr; }
-    .trade-meta { display: none; } /* Mobilde çok yer kaplamaması için gizlenebilir veya alt satıra alınabilir */
+    .trade-meta { display: none; } 
   }
 </style>
 </head>
@@ -222,8 +227,9 @@
     <div class="pin-bar">
       <label>ADMİN PİN</label>
       <input type="password" id="admin-pin" placeholder="••••" maxlength="8" oninput="checkPin()" style="max-width:80px" />
-      <span class="pin-status no" id="pin-status">kilitli — sadece görüntüleme</span>
-      <button class="reset-btn" onclick="resetAccount()">HESABI RESETLE</button>
+      <span class="pin-status no" id="pin-status">kilitli</span>
+      <button class="reset-btn" onclick="setResetPoint()">HESABI RESETLE</button>
+      <span id="clear-reset-btn" onclick="clearResetPoint()">(Sıfırlamayı İptal Et)</span>
     </div>
     
     <p class="form-title">Yeni İşlem</p>
@@ -304,7 +310,10 @@
   </div>
 
   <div id="tab-stats" class="section">
-    <div class="stats-title">İstatistik (Sadece Live)</div>
+    <div class="stats-title">
+        İstatistik (Sadece Live)
+        <span class="reset-badge" id="reset-badge">SIFIRLANMIŞ VERİ</span>
+    </div>
     
     <div class="gauge-wrap" id="gauge-container"></div>
 
@@ -358,7 +367,9 @@ let activeFilter = 'all';
 let calYear = new Date().getFullYear();
 let calMonth = new Date().getMonth();
 
-// Setup Selector'ı Doldur
+// Lokal reset ID okuma (Böylece istatistikler bu ID'den sonrasını baz alır)
+let resetId = parseInt(localStorage.getItem('atilla_reset_id')) || 0;
+
 const setupSelector = document.getElementById('setup-selector');
 SETUPS.forEach(s => {
     const tag = document.createElement('div');
@@ -384,22 +395,42 @@ function checkPin() {
     document.body.classList.add('admin-unlocked');
     document.getElementById('submit-btn').disabled = false;
   } else {
-    st.textContent = 'kilitli — sadece görüntüleme';
+    st.textContent = 'kilitli';
     st.className = 'pin-status no';
     document.body.classList.remove('admin-unlocked');
     document.getElementById('submit-btn').disabled = true;
   }
+  updateResetUI();
 }
 
-async function resetAccount() {
+function updateResetUI() {
+    const clearBtn = document.getElementById('clear-reset-btn');
+    if (clearBtn) {
+        clearBtn.style.display = (adminUnlocked && resetId > 0) ? 'inline-block' : 'none';
+    }
+}
+
+function setResetPoint() {
     if(!adminUnlocked) return;
-    if(!confirm("DİKKAT: Tüm işlem geçmişi kalıcı olarak silinecek ve hesap başlangıca dönecek! Emin misin?")) return;
-    try {
-        const res = await fetch(SUPABASE_URL + '/rest/v1/trades?id=gt.0', { method: 'DELETE', headers: H });
-        if(!res.ok) throw new Error();
-        alert("Hesap sıfırlandı.");
-        await loadTrades();
-    } catch(e) { alert("Sıfırlama hatası!"); }
+    if(!confirm("İstatistiklerin ve Equity Curve 25.000$'a sıfırlanacak. (Geçmiş işlemlerin LİSTEDE kalmaya devam edecek). Emin misin?")) return;
+    
+    // Mevcut en yüksek ID'yi bul ve kaydet
+    const maxId = trades.length > 0 ? Math.max(...trades.map(t => t.id)) : 0;
+    localStorage.setItem('atilla_reset_id', maxId);
+    resetId = maxId;
+    
+    showMsg("İstatistikler sıfırlandı!", "ok");
+    updateResetUI();
+    render();
+}
+
+function clearResetPoint() {
+    if(!adminUnlocked) return;
+    localStorage.removeItem('atilla_reset_id');
+    resetId = 0;
+    showMsg("Sıfırlama geri alındı!", "ok");
+    updateResetUI();
+    render();
 }
 
 function selectMode(m) {
@@ -447,6 +478,7 @@ async function loadTrades() {
   } catch(e) {
     document.getElementById('conn-status').textContent = 'bağlantı hatası';
   }
+  updateResetUI();
   render();
 }
 
@@ -465,8 +497,6 @@ async function addTrade() {
   }
 
   let pnl = selectedResult === 'win' ? Math.abs(rawPnl) : (selectedResult === 'lose' ? -Math.abs(rawPnl) : 0);
-  
-  // Eğer mod Paper ise, veritabanındaki result sütununa 'paper-win', 'paper-lose' olarak kaydediyoruz.
   const dbResult = selectedMode === 'paper' ? 'paper-' + selectedResult : selectedResult;
 
   const btn = document.getElementById('submit-btn');
@@ -500,17 +530,23 @@ function resetForm() {
 }
 
 function render() {
-    // Sadece LIVE işlemleri istatistiklere katıyoruz
-    const liveTrades = trades.filter(t => !t.result.startsWith('paper-'));
-    const totalPnl = liveTrades.reduce((s, t) => s + Number(t.pnl), 0);
+    // Listeyi her halükarda TÜM verilerle doldur (Filtrelere göre)
+    renderList();
+
+    // İstatistikler için SADECE (Live + Reset ID sonrasındaki) işlemleri baz alıyoruz
+    const liveTradesAll = trades.filter(t => !t.result.startsWith('paper-'));
+    const liveTradesStats = liveTradesAll.filter(t => t.id > resetId);
+    
+    document.getElementById('reset-badge').style.display = resetId > 0 ? 'inline-block' : 'none';
+
+    const totalPnl = liveTradesStats.reduce((s, t) => s + Number(t.pnl), 0);
     const currentEquity = INITIAL_BALANCE + totalPnl;
 
-    renderList();
     renderGauge(currentEquity);
-    renderStats(liveTrades, totalPnl);
-    renderEquityChart(liveTrades);
-    renderSymbolStats(liveTrades);
-    renderCal(liveTrades);
+    renderStats(liveTradesStats, totalPnl);
+    renderEquityChart(liveTradesStats);
+    renderSymbolStats(liveTradesStats);
+    renderCal(liveTradesStats);
 }
 
 function renderList() {
@@ -715,9 +751,10 @@ function changeMonth(d) {
   calMonth += d;
   if (calMonth < 0) { calMonth = 11; calYear--; }
   if (calMonth > 11) { calMonth = 0; calYear++; }
-  // Takvimi renderlarken live trades gerekiyor
-  const liveTrades = trades.filter(t => !t.result.startsWith('paper-'));
-  renderCal(liveTrades);
+  // Sadece Reset ID sonrasındaki Live işlemleri takvime ver
+  const liveTradesAll = trades.filter(t => !t.result.startsWith('paper-'));
+  const liveTradesStats = liveTradesAll.filter(t => t.id > resetId);
+  renderCal(liveTradesStats);
 }
 
 function renderCal(realTrades) {
@@ -775,8 +812,9 @@ function showTab(t) {
   document.getElementById('tab-' + t).classList.add('active');
   document.querySelectorAll('.tab')[['log','list','stats'].indexOf(t)].classList.add('active');
   if (t === 'stats') {
-      const liveTrades = trades.filter(tr => !tr.result.startsWith('paper-'));
-      setTimeout(() => renderEquityChart(liveTrades), 100);
+      const liveTradesAll = trades.filter(tr => !tr.result.startsWith('paper-'));
+      const liveTradesStats = liveTradesAll.filter(tr => tr.id > resetId);
+      setTimeout(() => renderEquityChart(liveTradesStats), 100);
   }
 }
 
