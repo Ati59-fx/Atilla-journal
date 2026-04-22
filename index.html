@@ -28,33 +28,14 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Syne', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
-  header {
-    border-bottom: 1px solid var(--border);
-    padding: 0 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 56px;
-    position: sticky;
-    top: 0;
-    background: var(--bg);
-    z-index: 100;
-  }
+  header { border-bottom: 1px solid var(--border); padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 56px; position: sticky; top: 0; background: var(--bg); z-index: 100; }
   .logo { font-size: 16px; font-weight: 800; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
   .logo-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; }
   .tabs { display: flex; }
-  .tab {
-    padding: 0 18px; height: 56px; display: flex; align-items: center;
-    font-size: 13px; font-weight: 500; color: var(--muted); cursor: pointer;
-    border-bottom: 2px solid transparent; border-top: none; border-left: none; border-right: none;
-    background: none; font-family: 'Syne', sans-serif; transition: all 0.15s;
-  }
+  .tab { padding: 0 18px; height: 56px; display: flex; align-items: center; font-size: 13px; font-weight: 500; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; border-top: none; border-left: none; border-right: none; background: none; font-family: 'Syne', sans-serif; transition: all 0.15s; }
   .tab:hover { color: var(--text); }
   .tab.active { color: var(--text); border-bottom-color: var(--green); }
-  .status { font-size: 11px; color: var(--muted); font-family: 'JetBrains Mono', monospace; display: flex; align-items: center; gap: 6px; }
-  .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-
+  
   main { max-width: 920px; margin: 0 auto; padding: 2rem; }
   .section { display: none; }
   .section.active { display: block; }
@@ -64,172 +45,48 @@
   .form-full { grid-column: 1 / -1; }
   .field { display: flex; flex-direction: column; gap: 6px; }
   label { font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
-  input, textarea, select {
-    background: var(--surface); border: 1px solid var(--border2); border-radius: 8px;
-    color: var(--text); font-size: 14px; font-family: 'Syne', sans-serif;
-    padding: 10px 12px; outline: none; transition: border-color 0.15s; width: 100%;
-  }
+  input, textarea, select { background: var(--surface); border: 1px solid var(--border2); border-radius: 8px; color: var(--text); font-size: 14px; font-family: 'Syne', sans-serif; padding: 10px 12px; outline: none; transition: border-color 0.15s; width: 100%; }
   input:focus, textarea:focus, select:focus { border-color: var(--green); }
-  textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
   
-  .setup-grid { display: flex; flex-wrap: wrap; gap: 6px; background: var(--surface); padding: 12px; border-radius: 8px; border: 1px solid var(--border2); }
-  .setup-tag { 
-    padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; 
-    border: 1px solid var(--border2); color: var(--muted); cursor: pointer; 
-    transition: all 0.15s; font-family: 'JetBrains Mono', monospace;
-  }
-  .setup-tag.active { background: var(--green-dim); border-color: var(--green); color: var(--green); }
-
-  .result-row { display: flex; gap: 8px; }
-  .result-btn {
-    flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border2);
-    background: var(--surface); color: var(--muted); font-size: 14px; font-weight: 700;
-    cursor: pointer; transition: all 0.15s; font-family: 'Syne', sans-serif; letter-spacing: 0.5px;
-  }
+  .mode-row, .result-row { display: flex; gap: 8px; }
+  .mode-btn, .result-btn { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border2); background: var(--surface); color: var(--muted); font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s; font-family: 'Syne', sans-serif; }
+  
+  .mode-btn.live.active { background: var(--green-dim); border-color: var(--green); color: var(--green); }
+  .mode-btn.paper.active { background: var(--paper-dim); border-color: var(--paper); color: var(--paper); }
+  
   .result-btn.win.active { background: var(--green-dim); border-color: var(--green); color: var(--green); }
   .result-btn.lose.active { background: var(--red-dim); border-color: var(--red); color: var(--red); }
   .result-btn.be.active { background: var(--neutral-dim); border-color: var(--neutral); color: var(--neutral); }
-  .result-btn.paper.active { background: var(--paper-dim); border-color: var(--paper); color: var(--paper); }
 
-  .pnl-preview { font-size: 11px; font-family: 'JetBrains Mono', monospace; margin-top: 4px; height: 16px; }
-  .pnl-preview.pos { color: var(--green); }
-  .pnl-preview.neg { color: var(--red); }
-  .pnl-preview.neu { color: var(--neutral); }
-  .pnl-preview.pap { color: var(--paper); }
+  .setup-grid { display: flex; flex-wrap: wrap; gap: 6px; background: var(--surface); padding: 12px; border-radius: 8px; border: 1px solid var(--border2); }
+  .setup-tag { padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 700; border: 1px solid var(--border2); color: var(--muted); cursor: pointer; transition: all 0.15s; font-family: 'JetBrains Mono', monospace; }
+  .setup-tag.active { background: var(--green-dim); border-color: var(--green); color: var(--green); }
 
-  .submit-btn {
-    width: 100%; margin-top: 16px; padding: 12px; background: var(--green); color: #000;
-    border: none; border-radius: 8px; font-size: 14px; font-weight: 800; cursor: pointer;
-    font-family: 'Syne', sans-serif; letter-spacing: 0.5px; transition: opacity 0.15s;
-  }
-  .submit-btn:hover { opacity: 0.85; }
+  .submit-btn { width: 100%; margin-top: 16px; padding: 12px; background: var(--green); color: #000; border: none; border-radius: 8px; font-size: 14px; font-weight: 800; cursor: pointer; font-family: 'Syne', sans-serif; transition: opacity 0.15s; }
   .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-  .pin-bar {
-    display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem;
-    padding: 12px 16px; background: var(--surface); border: 1px solid var(--border2); border-radius: 8px;
-  }
-  .pin-bar label { margin: 0; white-space: nowrap; }
-  .pin-status { font-size: 12px; font-family: 'JetBrains Mono', monospace; flex: 1; }
-  .pin-status.ok { color: var(--green); }
-  .pin-status.no { color: var(--muted); }
-  .reset-btn { 
-    background: var(--red-dim); color: var(--red); border: 1px solid var(--red); 
-    padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 800; cursor: pointer;
-    display: none; transition: 0.15s;
-  }
+  .pin-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem; padding: 12px 16px; background: var(--surface); border: 1px solid var(--border2); border-radius: 8px; }
+  .reset-btn { background: var(--red-dim); color: var(--red); border: 1px solid var(--red); padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 800; cursor: pointer; display: none; }
   .admin-unlocked .reset-btn { display: block; }
-  .reset-btn:hover { background: var(--red); color: #000; }
 
-  .list-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 10px; }
-  .list-title { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
-  .trade-count { font-size: 12px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
-
-  .filter-row { display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; }
-  .filter-btn {
-    padding: 5px 12px; border-radius: 6px; border: 1px solid var(--border2);
-    background: var(--surface); color: var(--muted); font-size: 12px; font-weight: 600;
-    cursor: pointer; font-family: 'Syne', sans-serif; transition: all 0.15s;
-  }
-  .filter-btn.active { border-color: var(--green); color: var(--green); background: var(--green-dim); }
-
-  .trade-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 10px; margin-bottom: 8px; overflow: hidden; transition: border-color 0.15s;
-  }
-  .trade-card:hover { border-color: var(--border2); }
+  .trade-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 8px; overflow: hidden; transition: border-color 0.15s; }
   .trade-card.win { border-left: 3px solid var(--green); }
   .trade-card.lose { border-left: 3px solid var(--red); }
   .trade-card.be { border-left: 3px solid var(--neutral); }
-  .trade-card.paper { border-left: 3px solid var(--paper); }
-
   .trade-top { display: flex; align-items: center; gap: 12px; padding: 12px 16px; cursor: pointer; }
-  .badge { font-size: 10px; font-weight: 800; letter-spacing: 1px; padding: 3px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; }
+  
+  .badge { font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; }
   .badge.win { background: var(--green-dim); color: var(--green); }
   .badge.lose { background: var(--red-dim); color: var(--red); }
   .badge.be { background: var(--neutral-dim); color: var(--neutral); }
-  .badge.paper { background: var(--paper-dim); color: var(--paper); }
-  
-  .sym-badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 4px; background: #1a1a1a; color: var(--muted); font-family: 'JetBrains Mono', monospace; border: 1px solid var(--border2); }
+  .badge.paper-tag { background: var(--paper-dim); color: var(--paper); border: 1px solid var(--paper-dim); }
 
-  .trade-meta { display: flex; gap: 16px; flex: 1; flex-wrap: wrap; }
-  .meta-item { font-size: 13px; color: var(--muted); display: flex; flex-direction: column; gap: 1px; }
-  .meta-val { font-size: 14px; font-weight: 600; color: var(--text); font-family: 'JetBrains Mono', monospace; }
-  .meta-val.pos { color: var(--green); }
-  .meta-val.neg { color: var(--red); }
-
-  .trade-actions { display: flex; gap: 8px; align-items: center; margin-left: auto; }
-  .chart-link { font-size: 11px; color: var(--muted); text-decoration: none; padding: 4px 8px; border: 1px solid var(--border2); border-radius: 4px; font-family: 'JetBrains Mono', monospace; transition: all 0.15s; }
-  .chart-link:hover { color: var(--text); border-color: var(--muted); }
-  .expand-icon { font-size: 10px; color: var(--muted); transition: transform 0.2s; }
-  .expand-icon.open { transform: rotate(180deg); }
-  .del-btn { background: none; border: none; color: var(--muted2); cursor: pointer; font-size: 14px; padding: 4px 6px; border-radius: 4px; transition: all 0.15s; display: none; }
-  .del-btn:hover { color: var(--red); background: var(--red-dim); }
-  .admin-unlocked .del-btn { display: block; }
-
-  .trade-notes { padding: 0 16px; max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s ease; font-size: 14px; color: var(--muted); line-height: 1.7; border-top: 0 solid var(--border); }
+  .trade-notes { padding: 0 16px; max-height: 0; overflow: hidden; transition: max-height 0.3s ease; font-size: 14px; color: var(--muted); border-top: 0 solid var(--border); }
   .trade-notes.open { max-height: 600px; padding: 12px 16px 14px; border-top-width: 1px; }
-  .setup-display { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 12px; }
-  .setup-mini-badge { background: var(--surface2); color: #fff; font-size: 10px; padding: 2px 8px; border-radius: 4px; border: 1px solid var(--border2); font-family: 'JetBrains Mono', monospace; font-weight: 600; }
 
-  .stats-title { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 1.5rem; }
-  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 2rem; }
-  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
-  .stat-label { font-size: 10px; font-weight: 600; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
-  .stat-val { font-size: 24px; font-weight: 800; font-family: 'JetBrains Mono', monospace; letter-spacing: -1px; }
-  .stat-val.pos { color: var(--green); }
-  .stat-val.neg { color: var(--red); }
-  .stat-detail { font-size: 11px; color: var(--muted); margin-top: 6px; font-family: 'JetBrains Mono', monospace; line-height: 1.4; }
-
-  /* GAUGE / TARGET BAR */
   .gauge-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 2rem; }
-  .gauge-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px; }
-  .gauge-title { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
-  .gauge-equity { font-size: 20px; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
   .gauge-bar-outer { height: 12px; background: var(--surface2); border-radius: 6px; position: relative; overflow: hidden; border: 1px solid var(--border); }
   .gauge-bar-inner { height: 100%; width: 0%; background: linear-gradient(90deg, var(--red) 0%, var(--green) 100%); transition: width 0.5s ease; }
-  .gauge-marker { position: absolute; top: 0; bottom: 0; width: 2px; background: #fff; z-index: 2; }
-  .gauge-labels { display: flex; justify-content: space-between; margin-top: 8px; font-size: 10px; font-family: 'JetBrains Mono', monospace; color: var(--muted); }
-
-  .chart-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 2rem; }
-  .chart-label { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px; }
-  .chart-canvas { height: 200px; position: relative; }
-
-  .symbol-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 2rem; }
-  .symbol-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
-  .symbol-name { font-size: 13px; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--text); margin-bottom: 10px; }
-  .symbol-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
-  .symbol-row span:last-child { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--text); }
-
-  .period-grid { display: grid; gap: 8px; }
-  .period-row {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px;
-    display: grid; grid-template-columns: 160px 70px 70px 90px 1fr; align-items: center; gap: 12px;
-  }
-  .period-label { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--text); font-size: 12px; }
-  .period-bar-wrap { background: var(--border); border-radius: 4px; height: 4px; overflow: hidden; }
-  .period-bar { height: 4px; border-radius: 4px; background: var(--green); }
-  .period-bar.neg { background: var(--red); }
-
-  .cal-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
-  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); }
-  .cal-dow { text-align: center; font-size: 10px; font-weight: 700; color: var(--muted2); letter-spacing: 1px; padding: 10px 0; border-bottom: 1px solid var(--border); text-transform: uppercase; }
-  .cal-day { min-height: 72px; padding: 8px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-  .cal-day:nth-child(7n) { border-right: none; }
-  .cal-day.empty { background: #0d0d0d; }
-  .cal-day.profit { background: #001a0d; }
-  .cal-day.loss { background: #1a0005; }
-  .cal-day.today { background: #0a1a0a; outline: 1px solid var(--green); outline-offset: -1px; }
-
-  @media (max-width: 600px) {
-    header { padding: 0 1rem; }
-    .tab { padding: 0 12px; font-size: 12px; }
-    main { padding: 1rem; }
-    .stats-grid { grid-template-columns: 1fr 1fr; }
-    .symbol-grid { grid-template-columns: 1fr; }
-    .form-grid { grid-template-columns: 1fr; }
-    .period-row { grid-template-columns: 1fr 1fr; }
-  }
 </style>
 </head>
 <body>
@@ -241,112 +98,72 @@
     <button class="tab" onclick="showTab('list')">İşlemler</button>
     <button class="tab" onclick="showTab('stats')">İstatistik</button>
   </div>
-  <div class="status">
-    <div class="status-dot"></div>
-    <span id="conn-status">bağlanıyor...</span>
-  </div>
 </header>
 
 <main>
   <div id="tab-log" class="section active">
     <div class="pin-bar">
-      <label>ADMİN PİN</label>
-      <input type="password" id="admin-pin" placeholder="••••" maxlength="8" oninput="checkPin()" style="max-width:80px" />
-      <span class="pin-status no" id="pin-status">kilitli — sadece görüntüleme</span>
+      <input type="password" id="admin-pin" placeholder="PIN" maxlength="8" oninput="checkPin()" style="max-width:80px; background:var(--bg); border:1px solid var(--border2); color:white; padding:5px; border-radius:4px" />
+      <span id="pin-status" style="font-size:12px; color:var(--muted); flex:1; margin-left:10px">kilitli</span>
       <button class="reset-btn" onclick="resetAccount()">HESABI RESETLE</button>
     </div>
-    <p class="form-title">Yeni İşlem</p>
+
     <div class="form-grid">
+      <div class="field form-full">
+        <label>İşlem Tipi</label>
+        <div class="mode-row">
+          <button class="mode-btn live" id="mode-live" onclick="selectMode('live')">LIVE ACCOUNT</button>
+          <button class="mode-btn paper" id="mode-paper" onclick="selectMode('paper')">PAPER TRADE</button>
+        </div>
+      </div>
+      
       <div class="field">
         <label>Tarih</label>
         <input type="date" id="f-date" />
       </div>
+      
       <div class="field">
         <label>Sonuç</label>
         <div class="result-row">
           <button class="result-btn win" id="btn-win" onclick="selectResult('win')">WIN</button>
-          <button class="result-btn be" id="btn-be" onclick="selectResult('be')">B.E</button>
           <button class="result-btn lose" id="btn-lose" onclick="selectResult('lose')">LOSE</button>
-          <button class="result-btn paper" id="btn-paper" onclick="selectResult('paper')">PAPER</button>
+          <button class="result-btn be" id="btn-be" onclick="selectResult('be')">B.E</button>
         </div>
       </div>
-      <div class="field">
-        <label>Sembol</label>
-        <select id="f-symbol">
-          <option value="MNQ1!">MNQ1!</option>
-          <option value="MES1!">MES1!</option>
-          <option value="MYM1!">MYM1!</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>RR Oranı</label>
-        <input type="number" id="f-rr" placeholder="2.5" step="0.1" min="0" />
-      </div>
+
+      <div class="field"><label>Sembol</label><select id="f-symbol"><option>MNQ1!</option><option>MES1!</option><option>MYM1!</option></select></div>
+      <div class="field"><label>RR Oranı</label><input type="number" id="f-rr" placeholder="2.5" step="0.1" /></div>
 
       <div class="field form-full">
         <label>Setup / Konfirmeler</label>
-        <div class="setup-grid" id="setup-selector">
-          </div>
+        <div class="setup-grid" id="setup-selector"></div>
       </div>
 
       <div class="field form-full">
-        <label>PNL</label>
-        <input type="number" id="f-pnl" placeholder="150" min="0" oninput="updatePnlPreview()" />
-        <div class="pnl-preview" id="pnl-preview"></div>
+        <label>PNL ($)</label>
+        <input type="number" id="f-pnl" placeholder="Örn: 150" />
       </div>
-      <div class="field form-full">
-        <label>TradingView Chart Linki</label>
-        <input type="url" id="f-link" placeholder="https://www.tradingview.com/chart/..." />
-      </div>
-      <div class="field form-full">
-        <label>İşlem Notu</label>
-        <textarea id="f-notes" placeholder="Neden aldın, psikolojin nasıldı..."></textarea>
-      </div>
+
+      <div class="field form-full"><label>Chart Linki</label><input type="url" id="f-link" /></div>
+      <div class="field form-full"><label>Notlar</label><textarea id="f-notes"></textarea></div>
     </div>
-    <button class="submit-btn" id="submit-btn" onclick="addTrade()">İŞLEMİ KAYDET</button>
-    <div class="msg" id="form-msg"></div>
+    <button class="submit-btn" id="submit-btn" onclick="addTrade()" disabled>İŞLEMİ KAYDET</button>
   </div>
 
   <div id="tab-list" class="section">
-    <div class="list-header">
-      <div class="list-title">İşlemler</div>
-      <div class="trade-count" id="trade-count"></div>
-    </div>
     <div class="filter-row">
       <button class="filter-btn active" onclick="setFilter(this,'all')">Tümü</button>
-      <button class="filter-btn" onclick="setFilter(this,'win')">WIN</button>
-      <button class="filter-btn" onclick="setFilter(this,'be')">B.E</button>
-      <button class="filter-btn" onclick="setFilter(this,'lose')">LOSE</button>
-      <button class="filter-btn" onclick="setFilter(this,'paper')">PAPER</button>
+      <button class="filter-btn" onclick="setFilter(this,'live')">Live</button>
+      <button class="filter-btn" onclick="setFilter(this,'paper')">Paper</button>
     </div>
     <div id="trade-list"></div>
   </div>
 
   <div id="tab-stats" class="section">
-    <div class="stats-title">İstatistik</div>
-    
-    <div class="gauge-wrap" id="gauge-container">
-        </div>
-
-    <div class="stats-grid" id="stats-grid"></div>
-
-    <div class="chart-wrap">
-      <div class="chart-label">Equity Curve (25k Başlangıç)</div>
-      <div class="chart-canvas"><canvas id="equity-chart"></canvas></div>
-    </div>
-
-    <div class="chart-label" style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:1rem">Sembol Bazında</div>
-    <div class="symbol-grid" id="symbol-grid"></div>
-
-    <hr class="section-sep">
-
-    <div class="chart-label" style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:1rem">Özet Rapor</div>
-    <div class="period-grid" id="period-grid"></div>
-
-    <hr class="section-sep">
-
-    <div class="cal-wrap">
-      <div class="cal-grid" id="cal-grid"></div>
+    <div id="gauge-container" class="gauge-wrap"></div>
+    <div class="stats-grid" id="stats-grid" style="display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:2rem"></div>
+    <div class="chart-wrap" style="background:var(--surface); padding:20px; border-radius:10px; border:1px solid var(--border)">
+        <canvas id="equity-chart" height="200"></canvas>
     </div>
   </div>
 </main>
@@ -356,285 +173,167 @@ const SUPABASE_URL = 'https://ssopmrubowgvdjhitfba.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_pn_1Ve9kiTi9IkzEssOchg_Qd6VA3pu';
 const ADMIN_PIN = '5959';
 const INITIAL_BALANCE = 25000;
-const PROFIT_TARGET = 1250; 
-const DRAWDOWN_LIMIT = 1000; 
-
-const SETUPS = [
-    "WC", "DC", "90MC", "MICRO CYCLE", "5M SD", "15M SD", "30M SD", 
-    "1H SD", "4H SD", "MMxM", "4h po3", "30m po3", "1h po3", 
-    "PSP", "PRC", "15s cisd", "1m cisd"
-];
-
+const SETUPS = ["WC","DC","90MC","MICRO CYCLE","5M SD","15M SD","30M SD","1H SD","4H SD","MMxM","4h po3","30m po3","1h po3","PSP","PRC","15s cisd","1m cisd"];
 const H = { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY };
 
 let trades = [];
+let selectedMode = 'live';
 let selectedResult = null;
 let selectedSetups = new Set();
 let adminUnlocked = false;
 let equityChart = null;
 let activeFilter = 'all';
 
-// Setup Seçiciyi Doldur
+// Setup Selector
 const setupSelector = document.getElementById('setup-selector');
 SETUPS.forEach(s => {
     const tag = document.createElement('div');
     tag.className = 'setup-tag';
     tag.textContent = s;
-    tag.onclick = () => {
-        tag.classList.toggle('active');
-        if(tag.classList.contains('active')) selectedSetups.add(s);
-        else selectedSetups.delete(s);
-    };
+    tag.onclick = () => { tag.classList.toggle('active'); tag.classList.contains('active') ? selectedSetups.add(s) : selectedSetups.delete(s); };
     setupSelector.appendChild(tag);
 });
 
-document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
-document.getElementById('submit-btn').disabled = true;
-
 function checkPin() {
-  const pin = document.getElementById('admin-pin').value;
-  adminUnlocked = pin === ADMIN_PIN;
-  const st = document.getElementById('pin-status');
-  if (adminUnlocked) {
-    st.textContent = '✓ admin modu açık';
-    st.className = 'pin-status ok';
-    document.body.classList.add('admin-unlocked');
-    document.getElementById('submit-btn').disabled = false;
-  } else {
-    st.textContent = 'kilitli — sadece görüntüleme';
-    st.className = 'pin-status no';
-    document.body.classList.remove('admin-unlocked');
-    document.getElementById('submit-btn').disabled = true;
-  }
+    adminUnlocked = document.getElementById('admin-pin').value === ADMIN_PIN;
+    document.getElementById('pin-status').textContent = adminUnlocked ? '✓ açık' : 'kilitli';
+    document.getElementById('submit-btn').disabled = !adminUnlocked;
+    document.body.classList.toggle('admin-unlocked', adminUnlocked);
 }
 
-async function resetAccount() {
-    if(!adminUnlocked) return;
-    if(!confirm("DİKKAT: Tüm işlem geçmişi kalıcı olarak silinecek ve hesap 25k'ya dönecek. Emin misin?")) return;
-    
-    try {
-        const res = await fetch(SUPABASE_URL + '/rest/v1/trades?id=gt.0', { method: 'DELETE', headers: H });
-        if(!res.ok) throw new Error();
-        alert("Hesap sıfırlandı.");
-        await loadTrades();
-    } catch(e) { alert("Sıfırlama hatası!"); }
+function selectMode(m) {
+    selectedMode = m;
+    document.getElementById('mode-live').classList.toggle('active', m === 'live');
+    document.getElementById('mode-paper').classList.toggle('active', m === 'paper');
 }
 
 function selectResult(v) {
-  selectedResult = v;
-  document.querySelectorAll('.result-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('btn-' + v).classList.add('active');
-  if(v === 'be' || v === 'paper') document.getElementById('f-pnl').value = 0;
-  updatePnlPreview();
-}
-
-function updatePnlPreview() {
-  const val = parseFloat(document.getElementById('f-pnl').value);
-  const prev = document.getElementById('pnl-preview');
-  if (!selectedResult || isNaN(val)) { prev.textContent = ''; return; }
-  if (selectedResult === 'paper') { prev.textContent = '→ Paper Trade (Data)'; prev.className = 'pnl-preview pap'; }
-  else if (selectedResult === 'be') { prev.textContent = '→ $0 (B.E)'; prev.className = 'pnl-preview neu'; }
-  else if (selectedResult === 'win') { prev.textContent = '→ +$' + val.toFixed(0); prev.className = 'pnl-preview pos'; }
-  else { prev.textContent = '→ -$' + val.toFixed(0); prev.className = 'pnl-preview neg'; }
+    selectedResult = v;
+    document.querySelectorAll('.result-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('btn-' + v).classList.add('active');
 }
 
 async function loadTrades() {
-  try {
-    const res = await fetch(SUPABASE_URL + '/rest/v1/trades?select=*&order=date.asc,created_at.asc', { headers: H });
-    if (!res.ok) throw new Error();
+    const res = await fetch(SUPABASE_URL + '/rest/v1/trades?select=*&order=date.asc', { headers: H });
     trades = await res.json();
-    document.getElementById('conn-status').textContent = 'canlı';
-  } catch(e) {
-    document.getElementById('conn-status').textContent = 'bağlantı hatası';
-  }
-  render();
+    render();
 }
 
 async function addTrade() {
-  if (!adminUnlocked) return;
-  const date = document.getElementById('f-date').value;
-  const rr = parseFloat(document.getElementById('f-rr').value);
-  const rawPnl = parseFloat(document.getElementById('f-pnl').value);
-  const link = document.getElementById('f-link').value.trim();
-  const notes = document.getElementById('f-notes').value.trim();
-  const symbol = document.getElementById('f-symbol').value;
-  const setupString = Array.from(selectedSetups).join(', ');
+    const pnlInput = parseFloat(document.getElementById('f-pnl').value) || 0;
+    const pnl = selectedResult === 'win' ? Math.abs(pnlInput) : (selectedResult === 'lose' ? -Math.abs(pnlInput) : 0);
+    
+    // Veritabanında Paper/Live ayrımı için 'result' sütununu kullanıyorduk. 
+    // Karışıklık olmaması için result: 'win', 'lose', 'be' ve setup kısmına m:paper ekliyoruz.
+    // Veya result kısmını 'paper-win' gibi kaydedebiliriz. En temizi setup stringine gizlemek veya ek sütun.
+    // Burada 'notes' kısmının başına [PAPER] ekleyerek veya result'ı modifiye ederek gidelim:
+    const finalResult = selectedMode === 'paper' ? 'paper-' + selectedResult : selectedResult;
 
-  if (!date || !selectedResult || isNaN(rr) || isNaN(rawPnl)) {
-    showMsg('Zorunlu alanları doldur!', 'err'); return;
-  }
-
-  let pnl = selectedResult === 'win' ? Math.abs(rawPnl) : (selectedResult === 'lose' ? -Math.abs(rawPnl) : 0);
-
-  try {
-    const res = await fetch(SUPABASE_URL + '/rest/v1/trades', {
-      method: 'POST',
-      headers: { ...H, 'Prefer': 'return=representation' },
-      body: JSON.stringify({ date, result: selectedResult, rr, pnl, link, notes, symbol, setup: setupString })
+    await fetch(SUPABASE_URL + '/rest/v1/trades', {
+        method: 'POST',
+        headers: { ...H, 'Prefer': 'return=representation' },
+        body: JSON.stringify({
+            date: document.getElementById('f-date').value,
+            result: finalResult,
+            rr: parseFloat(document.getElementById('f-rr').value),
+            pnl: pnl,
+            symbol: document.getElementById('f-symbol').value,
+            setup: Array.from(selectedSetups).join(', '),
+            notes: document.getElementById('f-notes').value,
+            link: document.getElementById('f-link').value
+        })
     });
-    if (!res.ok) throw new Error();
-    showMsg('İşlem kaydedildi!', 'ok');
-    resetForm();
-    await loadTrades();
-  } catch(e) { showMsg('Kaydetme hatası!', 'err'); }
-}
-
-function resetForm() {
-    document.getElementById('f-rr').value = '';
-    document.getElementById('f-pnl').value = '';
-    document.getElementById('f-link').value = '';
-    document.getElementById('f-notes').value = '';
-    selectedSetups.clear();
-    document.querySelectorAll('.setup-tag').forEach(t => t.classList.remove('active'));
-    selectedResult = null;
-    document.querySelectorAll('.result-btn').forEach(b => b.classList.remove('active'));
+    location.reload();
 }
 
 function render() {
-    const realTrades = trades.filter(t => t.result !== 'paper');
-    const totalPnl = realTrades.reduce((s, t) => s + Number(t.pnl), 0);
-    const currentEquity = INITIAL_BALANCE + totalPnl;
+    const liveTrades = trades.filter(t => !t.result.startsWith('paper-'));
+    const totalPnl = liveTrades.reduce((s, t) => s + Number(t.pnl), 0);
+    const equity = INITIAL_BALANCE + totalPnl;
 
-    renderGauge(currentEquity);
-    renderList();
-    renderStats(realTrades, totalPnl);
-    renderEquityChart(realTrades);
-    renderSymbolStats(realTrades);
-}
-
-function renderGauge(equity) {
-    const container = document.getElementById('gauge-container');
-    const targetVal = INITIAL_BALANCE + PROFIT_TARGET;
-    const drawdownVal = INITIAL_BALANCE - DRAWDOWN_LIMIT;
-    
-    // Bar yüzdesi (Drawdown ve Target arası)
-    const totalRange = targetVal - drawdownVal;
-    const currentFromMin = equity - drawdownVal;
-    let pct = (currentFromMin / totalRange) * 100;
-    pct = Math.max(0, Math.min(100, pct));
-
-    container.innerHTML = `
-        <div class="gauge-header">
-            <div class="gauge-title">Hesap Durumu (Target & Drawdown)</div>
-            <div class="gauge-equity" style="color: ${equity >= INITIAL_BALANCE ? 'var(--green)' : 'var(--red)'}">$${equity.toFixed(0)}</div>
+    // Gauge
+    const target = INITIAL_BALANCE + 1250;
+    const dd = INITIAL_BALANCE - 1000;
+    const pct = Math.max(0, Math.min(100, ((equity - dd) / (target - dd)) * 100));
+    document.getElementById('gauge-container').innerHTML = `
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px">
+            <span style="font-size:11px; color:var(--muted)">HESAP DURUMU</span>
+            <span style="font-family:JetBrains Mono; font-weight:800">$${equity.toFixed(0)}</span>
         </div>
-        <div class="gauge-bar-outer">
-            <div class="gauge-marker" style="left: ${((INITIAL_BALANCE - drawdownVal) / totalRange) * 100}%"></div>
-            <div class="gauge-bar-inner" style="width: ${pct}%"></div>
+        <div class="gauge-bar-outer"><div class="gauge-bar-inner" style="width:${pct}%"></div></div>
+    `;
+
+    // Stats
+    const wins = liveTrades.filter(t => t.result === 'win').length;
+    const loses = liveTrades.filter(t => t.result === 'lose').length;
+    const wr = (wins+loses) > 0 ? ((wins/(wins+loses))*100).toFixed(1) : 0;
+    document.getElementById('stats-grid').innerHTML = `
+        <div class="stat-card" style="background:var(--surface); padding:15px; border-radius:10px; border:1px solid var(--border)">
+            <div style="font-size:10px; color:var(--muted)">TOTAL PNL</div>
+            <div style="font-size:20px; font-weight:800; color:${totalPnl>=0?'var(--green)':'var(--red)'}">${totalPnl>=0?'+':''}$${totalPnl.toFixed(0)}</div>
         </div>
-        <div class="gauge-labels">
-            <span>DRAWDOWN ($${drawdownVal})</span>
-            <span>BAŞLANGIÇ ($${INITIAL_BALANCE})</span>
-            <span>TARGET ($${targetVal})</span>
+        <div class="stat-card" style="background:var(--surface); padding:15px; border-radius:10px; border:1px solid var(--border)">
+            <div style="font-size:10px; color:var(--muted)">WIN RATE</div>
+            <div style="font-size:20px; font-weight:800">${wr}%</div>
         </div>
     `;
-}
 
-function renderList() {
-  const el = document.getElementById('trade-list');
-  const list = [...trades].reverse().filter(t => activeFilter === 'all' ? true : t.result === activeFilter);
-  document.getElementById('trade-count').textContent = list.length + ' işlem';
-  
-  el.innerHTML = list.map(t => {
-      const setupBadges = t.setup ? t.setup.split(', ').map(s => `<span class="setup-mini-badge">${s}</span>`).join('') : '';
-      return `
-        <div class="trade-card ${t.result}">
-          <div class="trade-top" onclick="toggleNotes(${t.id})">
-            <span class="badge ${t.result}">${t.result === 'be' ? 'B.E' : t.result.toUpperCase()}</span>
-            <span class="sym-badge">${t.symbol || 'MNQ1!'}</span>
-            <div class="trade-meta">
-              <div class="meta-item"><span style="font-size:10px">TARİH</span><span class="meta-val">${t.date}</span></div>
-              <div class="meta-item"><span style="font-size:10px">RR</span><span class="meta-val">${t.rr}R</span></div>
-              <div class="meta-item"><span style="font-size:10px">PNL</span><span class="meta-val ${Number(t.pnl)>0?'pos':(Number(t.pnl)<0?'neg':'')}">${Number(t.pnl)>0?'+':''}$${Math.abs(Number(t.pnl)).toFixed(0)}</span></div>
-            </div>
-            <div class="trade-actions">
-              ${t.link ? '<a class="chart-link" href="' + t.link + '" target="_blank" onclick="event.stopPropagation()">CHART ↗</a>' : ''}
-              <span class="expand-icon" id="icon-${t.id}">▼</span>
-              <button class="del-btn" onclick="event.stopPropagation();deleteTrade(${t.id})">✕</button>
-            </div>
-          </div>
-          <div class="trade-notes" id="notes-${t.id}">
-            ${setupBadges ? `<div style="font-size:10px; color:var(--muted); margin-bottom:4px; font-weight:800">KONFİRMELER</div><div class="setup-display">${setupBadges}</div>` : ''}
-            <div style="font-size:10px; color:var(--muted); margin-bottom:4px; font-weight:800">NOTLAR</div>
-            ${t.notes || 'Not yok.'}
-          </div>
-        </div>
-      `;
-  }).join('');
-}
-
-function renderStats(realTrades, totalPnl) {
-    const el = document.getElementById('stats-grid');
-    if(!realTrades.length) { el.innerHTML = ''; return; }
-    
-    const wins = realTrades.filter(t => t.result === 'win').length;
-    const loses = realTrades.filter(t => t.result === 'lose').length;
-    const wr = (wins + loses) > 0 ? ((wins / (wins + loses)) * 100).toFixed(1) : "0.0";
-    
-    el.innerHTML = `
-        <div class="stat-card"><div class="stat-label">Toplam PnL</div><div class="stat-val ${totalPnl>=0?'pos':'neg'}">${totalPnl>=0?'+':''}$${totalPnl.toFixed(0)}</div></div>
-        <div class="stat-card"><div class="stat-label">Win Rate</div><div class="stat-val">${wr}%</div></div>
-        <div class="stat-card"><div class="stat-label">İşlem Sayısı</div><div class="stat-val">${realTrades.length}</div></div>
-        <div class="stat-card"><div class="stat-label">Ort. RR</div><div class="stat-val">${(realTrades.reduce((s,t)=>s+Number(t.rr),0)/realTrades.length).toFixed(2)}R</div></div>
-    `;
-}
-
-function renderEquityChart(realTrades) {
-  if (!realTrades.length) return;
-  const sorted = [...realTrades].sort((a, b) => a.date.localeCompare(b.date) || a.id - b.id);
-  let cum = INITIAL_BALANCE;
-  const labels = ['Başlangıç'];
-  const data = [INITIAL_BALANCE];
-  sorted.forEach(t => { cum += Number(t.pnl); labels.push(t.date); data.push(parseFloat(cum.toFixed(2))); });
-
-  if (equityChart) equityChart.destroy();
-  const ctx = document.getElementById('equity-chart').getContext('2d');
-  equityChart = new Chart(ctx, {
-    type: 'line',
-    data: { labels, datasets: [{ data, borderColor: '#00ff88', borderWidth: 2, pointRadius: 0, fill: true, backgroundColor: 'rgba(0,255,136,0.05)', tension: 0.3 }] },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { grid: { color: '#1a1a1a' }, ticks: { color: '#666' } } } }
-  });
-}
-
-function renderSymbolStats(realTrades) {
-    const el = document.getElementById('symbol-grid');
-    const syms = ['MNQ1!', 'MES1!', 'MYM1!'];
-    el.innerHTML = syms.map(s => {
-        const st = realTrades.filter(t => (t.symbol || 'MNQ1!') === s);
-        const pnl = st.reduce((acc, t) => acc + Number(t.pnl), 0);
+    // List
+    const list = [...trades].reverse().filter(t => {
+        if(activeFilter === 'live') return !t.result.startsWith('paper-');
+        if(activeFilter === 'paper') return t.result.startsWith('paper-');
+        return true;
+    });
+    document.getElementById('trade-list').innerHTML = list.map(t => {
+        const isPaper = t.result.startsWith('paper-');
+        const res = isPaper ? t.result.replace('paper-', '') : t.result;
         return `
-            <div class="symbol-card">
-                <div class="symbol-name">${s}</div>
-                <div class="symbol-row"><span>İşlem</span><span>${st.length}</span></div>
-                <div class="symbol-row"><span>PnL</span><span class="${pnl>=0?'pos':'neg'}">$${pnl.toFixed(0)}</span></div>
+            <div class="trade-card ${res}">
+                <div class="trade-top" onclick="this.nextElementSibling.classList.toggle('open')">
+                    <span class="badge ${res}">${res.toUpperCase()}</span>
+                    ${isPaper ? '<span class="badge paper-tag">PAPER</span>' : ''}
+                    <span style="flex:1; font-family:JetBrains Mono; font-size:13px">${t.date}</span>
+                    <span style="font-family:JetBrains Mono; font-weight:700">${isPaper ? '$0' : (t.pnl>=0?'+':'')+t.pnl}</span>
+                </div>
+                <div class="trade-notes">
+                    <div style="padding:10px 0; font-size:11px; color:var(--muted)">SETUPS: ${t.setup}</div>
+                    <div style="padding-bottom:10px">${t.notes}</div>
+                    ${t.link ? `<a href="${t.link}" target="_blank" style="color:var(--green); font-size:12px">View Chart ↗</a>` : ''}
+                </div>
             </div>
         `;
     }).join('');
-}
 
-function toggleNotes(id) {
-  document.getElementById('notes-' + id)?.classList.toggle('open');
-  document.getElementById('icon-' + id)?.classList.toggle('open');
+    // Chart
+    const ctx = document.getElementById('equity-chart').getContext('2d');
+    let cum = INITIAL_BALANCE;
+    const chartData = liveTrades.map(t => { cum += Number(t.pnl); return cum; });
+    if(equityChart) equityChart.destroy();
+    equityChart = new Chart(ctx, {
+        type: 'line',
+        data: { labels: liveTrades.map(t => t.date), datasets: [{ data: chartData, borderColor: '#00ff88', tension: 0.3, pointRadius: 0 }] },
+        options: { plugins: { legend: { display: false } }, scales: { x: { display: false } } }
+    });
 }
 
 function showTab(t) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + t).classList.add('active');
-  document.querySelectorAll('.tab')[['log','list','stats'].indexOf(t)].classList.add('active');
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + t).classList.add('active');
+    event.currentTarget.classList.add('active');
 }
 
 function setFilter(btn, f) {
-  activeFilter = f;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderList();
+    activeFilter = f;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    render();
 }
 
-function showMsg(txt, type) {
-  const el = document.getElementById('form-msg');
-  el.textContent = txt; el.className = 'msg ' + type;
-  setTimeout(() => { el.textContent = ''; el.className = 'msg'; }, 3000);
+async function resetAccount() {
+    if(!confirm("Tüm veriler silinecek!")) return;
+    await fetch(SUPABASE_URL + '/rest/v1/trades?id=gt.0', { method: 'DELETE', headers: H });
+    location.reload();
 }
 
 loadTrades();
