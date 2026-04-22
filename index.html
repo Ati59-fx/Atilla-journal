@@ -22,6 +22,8 @@
     --red-dim: #ff445522;
     --neutral: #888;
     --neutral-dim: #88888822;
+    --paper: #ffffff;
+    --paper-dim: #ffffff22;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Syne', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
@@ -81,11 +83,13 @@
   .result-btn.win.active { background: var(--green-dim); border-color: var(--green); color: var(--green); }
   .result-btn.lose.active { background: var(--red-dim); border-color: var(--red); color: var(--red); }
   .result-btn.be.active { background: var(--neutral-dim); border-color: var(--neutral); color: var(--neutral); }
+  .result-btn.paper.active { background: var(--paper-dim); border-color: var(--paper); color: var(--paper); }
 
   .pnl-preview { font-size: 11px; font-family: 'JetBrains Mono', monospace; margin-top: 4px; height: 16px; }
   .pnl-preview.pos { color: var(--green); }
   .pnl-preview.neg { color: var(--red); }
   .pnl-preview.neu { color: var(--neutral); }
+  .pnl-preview.pap { color: var(--paper); }
 
   .submit-btn {
     width: 100%; margin-top: 16px; padding: 12px; background: var(--green); color: #000;
@@ -128,12 +132,14 @@
   .trade-card.win { border-left: 3px solid var(--green); }
   .trade-card.lose { border-left: 3px solid var(--red); }
   .trade-card.be { border-left: 3px solid var(--neutral); }
+  .trade-card.paper { border-left: 3px solid var(--paper); }
 
   .trade-top { display: flex; align-items: center; gap: 12px; padding: 12px 16px; cursor: pointer; }
   .badge { font-size: 10px; font-weight: 800; letter-spacing: 1px; padding: 3px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; }
   .badge.win { background: var(--green-dim); color: var(--green); }
   .badge.lose { background: var(--red-dim); color: var(--red); }
   .badge.be { background: var(--neutral-dim); color: var(--neutral); }
+  .badge.paper { background: var(--paper-dim); color: var(--paper); }
   
   .sym-badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 4px; background: #1a1a1a; color: var(--muted); font-family: 'JetBrains Mono', monospace; border: 1px solid var(--border2); }
 
@@ -259,6 +265,7 @@
           <button class="result-btn win" id="btn-win" onclick="selectResult('win')">WIN</button>
           <button class="result-btn be" id="btn-be" onclick="selectResult('be')">B.E</button>
           <button class="result-btn lose" id="btn-lose" onclick="selectResult('lose')">LOSE</button>
+          <button class="result-btn paper" id="btn-paper" onclick="selectResult('paper')">PAPER</button>
         </div>
       </div>
       <div class="field">
@@ -301,6 +308,7 @@
       <button class="filter-btn" onclick="setFilter(this,'win')">WIN</button>
       <button class="filter-btn" onclick="setFilter(this,'be')">B.E</button>
       <button class="filter-btn" onclick="setFilter(this,'lose')">LOSE</button>
+      <button class="filter-btn" onclick="setFilter(this,'paper')">PAPER</button>
       <button class="filter-btn" onclick="setFilter(this,'MNQ1!')">MNQ1!</button>
       <button class="filter-btn" onclick="setFilter(this,'MES1!')">MES1!</button>
       <button class="filter-btn" onclick="setFilter(this,'MYM1!')">MYM1!</button>
@@ -383,8 +391,9 @@ function selectResult(v) {
   document.getElementById('btn-win').className = 'result-btn win' + (v==='win'?' active':'');
   document.getElementById('btn-be').className = 'result-btn be' + (v==='be'?' active':'');
   document.getElementById('btn-lose').className = 'result-btn lose' + (v==='lose'?' active':'');
+  document.getElementById('btn-paper').className = 'result-btn paper' + (v==='paper'?' active':'');
   
-  if(v === 'be') {
+  if(v === 'be' || v === 'paper') {
     document.getElementById('f-pnl').value = 0;
   }
   updatePnlPreview();
@@ -395,7 +404,10 @@ function updatePnlPreview() {
   const prev = document.getElementById('pnl-preview');
   if (!selectedResult || isNaN(val)) { prev.textContent = ''; prev.className = 'pnl-preview'; return; }
   
-  if (selectedResult === 'be') {
+  if (selectedResult === 'paper') {
+    prev.textContent = '→ Paper Trade (İstatistikleri etkilemez)';
+    prev.className = 'pnl-preview pap';
+  } else if (selectedResult === 'be') {
     prev.textContent = '→ $0 (Break-even) olarak kaydedilecek';
     prev.className = 'pnl-preview neu';
   } else if (selectedResult === 'win') {
@@ -436,7 +448,7 @@ async function addTrade() {
   let pnl = 0;
   if(selectedResult === 'win') pnl = Math.abs(rawPnl);
   else if(selectedResult === 'lose') pnl = -Math.abs(rawPnl);
-  else pnl = 0;
+  else pnl = 0; // BE ve Paper için 0
 
   const btn = document.getElementById('submit-btn');
   btn.disabled = true; btn.textContent = 'KAYDEDİLİYOR...';
@@ -458,6 +470,7 @@ async function addTrade() {
     document.getElementById('btn-win').className = 'result-btn win';
     document.getElementById('btn-be').className = 'result-btn be';
     document.getElementById('btn-lose').className = 'result-btn lose';
+    document.getElementById('btn-paper').className = 'result-btn paper';
     await loadTrades();
   } catch(e) { showMsg('Kaydetme hatası!', 'err'); }
 
@@ -508,7 +521,7 @@ function render() {
 function filteredTrades() {
   const rev = [...trades].reverse();
   if (activeFilter === 'all') return rev;
-  if (['win', 'lose', 'be'].includes(activeFilter)) return rev.filter(t => t.result === activeFilter);
+  if (['win', 'lose', 'be', 'paper'].includes(activeFilter)) return rev.filter(t => t.result === activeFilter);
   return rev.filter(t => (t.symbol || 'MNQ1!') === activeFilter);
 }
 
@@ -540,27 +553,27 @@ function renderList() {
 
 function renderStats() {
   const el = document.getElementById('stats-grid');
-  if (!trades.length) { el.innerHTML = ''; return; }
+  // İstatistikler için PAPER trade'leri hariç tutuyoruz
+  const realTrades = trades.filter(t => t.result !== 'paper');
+  if (!realTrades.length) { el.innerHTML = ''; return; }
   
-  const total = trades.length;
-  const wins = trades.filter(t => t.result === 'win').length;
-  const loses = trades.filter(t => t.result === 'lose').length;
-  const bes = trades.filter(t => t.result === 'be').length;
+  const total = realTrades.length;
+  const wins = realTrades.filter(t => t.result === 'win').length;
+  const loses = realTrades.filter(t => t.result === 'lose').length;
+  const bes = realTrades.filter(t => t.result === 'be').length;
 
-  // Win Rate (Sadece Win ve Lose üzerinden hesaplanır, BE dahil edilmez)
   const wrBase = wins + loses;
   const wr = wrBase > 0 ? ((wins / wrBase) * 100).toFixed(1) : "0.0";
   
-  // Dağılım Oranları (Tüm işlemler üzerinden)
   const winPct = ((wins / total) * 100).toFixed(1);
   const losePct = ((loses / total) * 100).toFixed(1);
   const bePct = ((bes / total) * 100).toFixed(1);
 
-  const totalPnl = trades.reduce((s, t) => s + Number(t.pnl), 0);
-  const grossWin = trades.filter(t => Number(t.pnl) > 0).reduce((s, t) => s + Number(t.pnl), 0);
-  const grossLoss = Math.abs(trades.filter(t => Number(t.pnl) < 0).reduce((s, t) => s + Number(t.pnl), 0));
+  const totalPnl = realTrades.reduce((s, t) => s + Number(t.pnl), 0);
+  const grossWin = realTrades.filter(t => Number(t.pnl) > 0).reduce((s, t) => s + Number(t.pnl), 0);
+  const grossLoss = Math.abs(realTrades.filter(t => Number(t.pnl) < 0).reduce((s, t) => s + Number(t.pnl), 0));
   const pf = grossLoss === 0 ? '∞' : (grossWin / grossLoss).toFixed(2);
-  const avgRR = (trades.reduce((s, t) => s + Number(t.rr), 0) / total).toFixed(2);
+  const avgRR = (realTrades.reduce((s, t) => s + Number(t.rr), 0) / total).toFixed(2);
 
   el.innerHTML = `
     <div class="stat-card"><div class="stat-label">Toplam PnL</div><div class="stat-val ${totalPnl>=0?'pos':'neg'}">${totalPnl>=0?'+':''}$${totalPnl.toFixed(0)}</div></div>
@@ -575,8 +588,10 @@ function renderStats() {
 }
 
 function renderEquityChart() {
-  if (!trades.length) return;
-  const sorted = [...trades].sort((a, b) => a.date.localeCompare(b.date) || a.id - b.id);
+  const realTrades = trades.filter(t => t.result !== 'paper');
+  if (!realTrades.length) return;
+  
+  const sorted = [...realTrades].sort((a, b) => a.date.localeCompare(b.date) || a.id - b.id);
   let cum = INITIAL_BALANCE;
   const labels = ['Başlangıç'];
   const data = [INITIAL_BALANCE];
@@ -609,8 +624,11 @@ function renderEquityChart() {
 function renderSymbolStats() {
   const el = document.getElementById('symbol-grid');
   const symbols = ['MNQ1!', 'MES1!', 'MYM1!'];
+  // PAPER trade'leri hariç tutarak sembol bazlı istatistikleri hesaplıyoruz
+  const realTradesOnly = trades.filter(t => t.result !== 'paper');
+
   el.innerHTML = symbols.map(sym => {
-    const st = trades.filter(t => (t.symbol || 'MNQ1!') === sym);
+    const st = realTradesOnly.filter(t => (t.symbol || 'MNQ1!') === sym);
     if (!st.length) return '<div class="symbol-card"><div class="symbol-name">' + sym + '</div><div class="symbol-row"><span>İşlem yok</span></div></div>';
     const wins = st.filter(t => t.result === 'win').length;
     const loses = st.filter(t => t.result === 'lose').length;
@@ -642,9 +660,12 @@ function getMonthKey(dateStr) {
 
 function renderPeriod() {
   const el = document.getElementById('period-grid');
-  if (!trades.length) { el.innerHTML = ''; return; }
+  // PAPER trade'leri hariç tutarak raporları hazırlıyoruz
+  const realTradesOnly = trades.filter(t => t.result !== 'paper');
+  if (!realTradesOnly.length) { el.innerHTML = ''; return; }
+  
   const groups = {};
-  trades.forEach(t => {
+  realTradesOnly.forEach(t => {
     const key = activePeriod === 'weekly' ? getWeekKey(t.date) : getMonthKey(t.date);
     if (!groups[key]) groups[key] = [];
     groups[key].push(t);
@@ -683,7 +704,11 @@ function renderCal() {
   const firstDay = (new Date(calYear, calMonth, 1).getDay() + 6) % 7;
   const today = new Date().toISOString().split('T')[0];
   const dayData = {};
-  trades.forEach(t => {
+  
+  // Takvimde PnL görebilmek için PAPER trade'leri hariç tutuyoruz
+  const realTradesOnly = trades.filter(t => t.result !== 'paper');
+
+  realTradesOnly.forEach(t => {
     const [y, m, dd] = t.date.split('-').map(Number);
     if (y === calYear && m === calMonth + 1) {
       if (!dayData[dd]) dayData[dd] = { pnl: 0, count: 0 };
